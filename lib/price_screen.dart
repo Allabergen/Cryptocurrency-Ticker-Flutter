@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:bitcoin_ticker/network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,9 +18,15 @@ class _PriceScreenState extends State<PriceScreen> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIOverlays([]);
+    updateUI();
   }
 
+  bool isLoading = true;
   String currencySelected = 'KZT';
+
+  String btcTicker = '1 BTC = 0 KZT';
+  String ethTicker = '1 ETH = 0 KZT';
+  String ltcTicker = '1 LTC = 0 KZT';
 
   DropdownButton<String> getDropdownButton() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -40,7 +47,9 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           currencySelected = value;
+          isLoading = true;
         });
+        updateUI();
       },
     );
   }
@@ -58,9 +67,40 @@ class _PriceScreenState extends State<PriceScreen> {
         onSelectedItemChanged: (int value) {
           setState(() {
             currencySelected = currenciesList[value];
+            isLoading = true;
           });
+          updateUI();
         },
         children: pickerItems);
+  }
+
+  void updateUI() async {
+    List askList = [];
+    for (String curr in cryptoList) {
+      var data = await NetworkHelper().getTickerData(curr, currencySelected);
+      double ask = data['ask'];
+      askList.add(ask.toStringAsFixed(2));
+    }
+
+    setState(() {
+      isLoading = false;
+      btcTicker = '1 BTC = ${askList[0]} $currencySelected';
+      ethTicker = '1 ETH = ${askList[1]} $currencySelected';
+      ltcTicker = '1 LTC = ${askList[2]} $currencySelected';
+    });
+  }
+
+  Widget getProgress() {
+    if (isLoading) {
+      return CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(Colors.white),
+      );
+    } else {
+      return Container(
+        width: 0.0,
+        height: 0.0,
+      );
+    }
   }
 
   @override
@@ -84,6 +124,7 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          // BTC
           Padding(
             padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
             child: Card(
@@ -95,7 +136,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  btcTicker,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -103,6 +144,59 @@ class _PriceScreenState extends State<PriceScreen> {
                   ),
                 ),
               ),
+            ),
+          ),
+          // ETH
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Color(0xFF474753),
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  ethTicker,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // LTC
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Color(0xFF474753),
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  ltcTicker,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 12,
+            child: Container(
+              width: 0.0,
+              height: 0.0,
+              alignment: Alignment.center,
+              child: getProgress(),
             ),
           ),
           Container(

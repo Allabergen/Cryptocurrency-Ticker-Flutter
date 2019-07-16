@@ -10,6 +10,7 @@ const List<String> currenciesList = [
   'ILS',
   'INR',
   'JPY',
+  'KZT',
   'MXN',
   'NOK',
   'NZD',
@@ -20,7 +21,6 @@ const List<String> currenciesList = [
   'SGD',
   'USD',
   'ZAR',
-  'KZT'
 ];
 
 const List<String> cryptoList = [
@@ -28,5 +28,3 @@ const List<String> cryptoList = [
   'ETH',
   'LTC',
 ];
-
-class CoinData {}

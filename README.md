@@ -1,4 +1,4 @@
-# Cryptocurrency Ticker 🤑
+# Cryptocurrency Ticker
 
 ## Goal
 

@@ -1,6 +1,11 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import './coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -12,6 +17,50 @@ class _PriceScreenState extends State<PriceScreen> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIOverlays([]);
+  }
+
+  String currencySelected = 'KZT';
+
+  DropdownButton<String> getDropdownButton() {
+    List<DropdownMenuItem<String>> dropdownItems = [];
+
+    for (String currency in currenciesList) {
+      dropdownItems.add(
+        DropdownMenuItem(
+          child: Center(child: Text(currency)),
+          value: currency,
+        ),
+      );
+    }
+
+    return DropdownButton<String>(
+      value: currencySelected,
+      elevation: 4,
+      items: dropdownItems,
+      onChanged: (value) {
+        setState(() {
+          currencySelected = value;
+        });
+      },
+    );
+  }
+
+  CupertinoPicker getPicker() {
+    List<Widget> pickerItems = [];
+
+    for (String currency in currenciesList) {
+      pickerItems.add(Center(child: Text(currency)));
+    }
+
+    return CupertinoPicker(
+        backgroundColor: Color(0xFF474753),
+        itemExtent: 36.0,
+        onSelectedItemChanged: (int value) {
+          setState(() {
+            currencySelected = currenciesList[value];
+          });
+        },
+        children: pickerItems);
   }
 
   @override
@@ -61,7 +110,13 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Color(0xFF474753),
-            child: null,
+            child: Theme(
+              data: Theme.of(context)
+                  .copyWith(canvasColor: Theme.of(context).primaryColor),
+              child: DropdownButtonHideUnderline(
+                child: Platform.isAndroid ? getDropdownButton() : getPicker(),
+              ),
+            ),
           ),
         ],
       ),
